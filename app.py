@@ -22,7 +22,7 @@ def update_quantity(df, scanned_item):
     if scanned_item in df['Material'].values:
         idx = df[df['Material'] == scanned_item].index[0]
         df.loc[idx, 'Source target qty'] -= 1
-        st.success(f" Order Number: {df.loc[idx, 'Transfer Order Number']} | Item: {scanned_item}    ({df.loc[idx, 'Source target qty']+ 1} -> {df.loc[idx, 'Source target qty']})")
+        st.success(f" Order Number: {df.loc[idx, 'Transfer Order Number']} | Item Number: {df.loc[idx, "Transfer order item"]} | Item: {scanned_item}    ({df.loc[idx, 'Source target qty']+ 1} -> {df.loc[idx, 'Source target qty']})")
         if df.loc[idx, 'Source target qty'] <= 0:
             df = df.drop(idx)
         st.session_state.scanned_item_count += 1
