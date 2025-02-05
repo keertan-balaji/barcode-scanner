@@ -22,7 +22,7 @@ def update_quantity(df, scanned_item):
     if scanned_item in df['Material'].values:
         idx = df[df['Material'] == scanned_item].index[0]
         df.loc[idx, 'Source target qty'] -= 1
-        st.success(f"Item scanned: {scanned_item} | Remaining Quantity: {df.loc[idx, 'Source target qty']}")
+        st.success(f" Order Number: {df.loc[idx, 'Transfer Order Number']} | Item: {scanned_item}    ({df.loc[idx, 'Source target qty']+ 1} -> {df.loc[idx, 'Source target qty']})")
         if df.loc[idx, 'Source target qty'] <= 0:
             df = df.drop(idx)
         st.session_state.scanned_item_count += 1
@@ -43,9 +43,9 @@ reference_file = st.file_uploader("Choose reference file", accept_multiple_files
 if reference_file:
     if st.session_state.df is None:
         reference_df = pd.read_excel(reference_file)
-        reference_df = reference_df[["Material","Source target qty"]]
+        reference_df = reference_df[["Transfer Order Number","Transfer order item","Material","Source target qty"]]
+        st.session_state.df = reference_df
         st.write(f"Reference file: {reference_file.name}")
-        st.session_state.df = reference_df.groupby('Material', as_index=False).sum()
 
     # Text input for scanning item (simulated as barcode input)
     st.text_input("Scan the item's barcode (type and press Enter):", 
@@ -60,7 +60,7 @@ if reference_file:
     st.write(f"Not scanned items: {st.session_state.not_scanned_item_count}")
     # Display the updated DataFrame
     st.write("Current Inventory:")
-    selected_rows = st.dataframe(st.session_state.df,on_select="rerun",height = 35*len(st.session_state.df),use_container_width=True)
+    selected_rows = st.dataframe(st.session_state.df,height = 35*len(st.session_state.df),use_container_width=True)
     # print(selected_rows)
     # Stop if all items are scanned
     if st.session_state.df.empty:
