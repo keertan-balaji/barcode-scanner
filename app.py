@@ -13,13 +13,16 @@ if 'scanned_item_count' not in st.session_state:
 if 'not_scanned_item_count' not in st.session_state:
     st.session_state.not_scanned_item_count = None
 
+if 'selected_rows' not in st.session_state and st.session_state.df is not None:
+    st.session_state.selected_rows = [False] * len(st.session_state.df)
+
 # Function to update quantity or remove item from DataFrame
 def update_quantity(df, scanned_item):
     scanned_item = scanned_item.strip()
     if scanned_item in df['Material'].values:
-        st.success(f"Scanned item: {scanned_item}")
         idx = df[df['Material'] == scanned_item].index[0]
         df.loc[idx, 'Source target qty'] -= 1
+        st.success(f"Item scanned: {scanned_item} | Remaining Quantity: {df.loc[idx, 'Source target qty']}")
         if df.loc[idx, 'Source target qty'] <= 0:
             df = df.drop(idx)
         st.session_state.scanned_item_count += 1
@@ -57,15 +60,12 @@ if reference_file:
     st.write(f"Not scanned items: {st.session_state.not_scanned_item_count}")
     # Display the updated DataFrame
     st.write("Current Inventory:")
-    st.table(st.session_state.df)
-
+    selected_rows = st.dataframe(st.session_state.df,on_select="rerun",height = 35*len(st.session_state.df),use_container_width=True)
+    # print(selected_rows)
     # Stop if all items are scanned
     if st.session_state.df.empty:
         st.success("All items scanned! Inventory complete.")
 
-    # Button to reset the DataFrame
-    if st.button("Reset Inventory"):
-        st.session_state.df = pd.read_excel(reference_file)
 
     # Inject JavaScript to focus on the input element automatically
     st.components.v1.html("""
@@ -73,3 +73,4 @@ if reference_file:
             document.getElementById("barcode_input").focus();
         </script>
         """, height=0)
+
