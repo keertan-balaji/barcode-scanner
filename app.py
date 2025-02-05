@@ -9,6 +9,7 @@ if 'df' not in st.session_state:
 
 # Function to update quantity or remove item from DataFrame
 def update_quantity(df, scanned_item):
+    scanned_item = scanned_item.strip()
     if scanned_item in df['Material'].values:
         idx = df[df['Material'] == scanned_item].index[0]
         df.loc[idx, 'Source target qty'] -= 1
